@@ -7,5 +7,52 @@
   <body>
     <h1>Stargazers log</h1>
     <p>A log of the repositories I've starred.</p>
+    <h2>Starred Repositories</h2>
+    <ul id="starred-repos">
+      <li>Loading starred repositories...</li>
+    </ul>
+
+    <script>
+      async function fetchStarredRepos() {
+        try {
+          // Replace 'octocat' with the target GitHub username if needed, or keep dynamic if configured
+          const response = await fetch('https://api.github.com/users/octocat/starred');
+          if (!response.ok) {
+            throw new Error('Failed to fetch starred repositories');
+          }
+          const repos = await response.json();
+          const listElement = document.getElementById('starred-repos');
+          listElement.innerHTML = '';
+
+          if (repos.length === 0) {
+            listElement.innerHTML = '<li>No starred repositories found.</li>';
+            return;
+          }
+
+          repos.forEach(repo => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = repo.html_url;
+            a.textContent = repo.full_name;
+            a.target = '_blank';
+            li.appendChild(a);
+            
+            if (repo.description) {
+              const desc = document.createElement('p');
+              desc.textContent = repo.description;
+              li.appendChild(desc);
+            }
+            
+            listElement.appendChild(li);
+          });
+        } catch (error) {
+          const listElement = document.getElementById('starred-repos');
+          listElement.innerHTML = '<li>Error loading starred repositories.</li>';
+          console.error(error);
+        }
+      }
+
+      fetchStarredRepos();
+    </script>
   </body>
 </html>
